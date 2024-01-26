@@ -84,6 +84,10 @@ class GeneticAlgorithm(Algorithm):
         # do the mating using the current population
         off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
 
+        # add indentifiers on new individuals
+        for ip,offspring in enumerate(off):
+            offspring.set("idx","%i_%i"%(self.n_gen,ip))
+
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(off) == 0:
             self.termination.force_termination = True

@@ -18,7 +18,6 @@ class ConsiderMaximumWeightRepair(Repair):
 
         # the corresponding F of each individuals
         weights = (Z * problem.W).sum(axis=1)
-
         # now repair each individual i
         for i in range(len(Z)):
 
@@ -52,3 +51,4 @@ res = minimize(problem,
                algorithm,
                termination=('n_gen', 10),
                verbose=True)
+print(res)

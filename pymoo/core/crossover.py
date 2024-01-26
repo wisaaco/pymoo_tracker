@@ -27,6 +27,13 @@ class Crossover(Operator):
         n_parents, n_offsprings = self.n_parents, self.n_offsprings
         n_matings, n_var = len(pop), problem.n_var
 
+        # for mating in pop:
+        #     print("match:")
+        #     for parent in mating:
+        #         print("\t",parent.data)
+        #         print("\t\t",parent.get("X"))
+
+
         # get the actual values from each of the parents
         X = np.swapaxes(np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1)
         if self.vtype is not None:
@@ -69,8 +76,39 @@ class Crossover(Operator):
         # create a population object
         off = Population.new("X", Xp)
 
-        return off
+        # print("OFF")
+        # for parent in off:
+        #     print("\t",parent.data)
+        #     print("\t\t",parent.get("X"))
 
+        # get the actual values from each of the parents
+        # something weird from getting X or Q in comparison with pop and off
+        iDparents = []
+        Xparents = []
+        for imatch,parents in enumerate(pop): #n_parents
+            for parent in parents:
+                iDparents.append(parent.get("idx"))
+                Xparents.append(parent.get("X"))
+
+        for child in off:
+            Xc = child.get("X")
+            max = -1
+            ix = -1
+            for ip,Xp in enumerate(Xparents):
+                tmax = np.equal(Xp,Xc).sum()
+                if max<tmax:
+                    ix = ip
+                    max = tmax
+            otherIxFather= ix+1 if ix%n_parents==0 else ix-1
+            child.set("parent",[iDparents[ix],iDparents[otherIxFather]])
+            child.set("pf",None)
+
+        # print("OFF_tagged")
+        # for parent in off:
+        #     print("\t",parent.data)
+        #     print("\t\t",parent.get("X"))
+
+        return off
     def _do(self, problem, X, **kwargs):
         pass
 

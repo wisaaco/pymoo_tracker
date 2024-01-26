@@ -33,7 +33,12 @@ class Sampling(Operator):
 
         """
         val = self._do(problem, n_samples, **kwargs)
-        return Population.new("X", val)
+        pop = Population.new("X", val)
+        #
+        for ix,individual in enumerate(pop):
+            individual.data = {"idx":"1_%i"%ix,"parent":["0","0"],"mutate": None,"mutate_rate":None,"pf":None}
+            # print(individual.data)
+        return pop
 
     @abstractmethod
     def _do(self, problem, n_samples, **kwargs):
