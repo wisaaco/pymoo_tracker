@@ -281,7 +281,11 @@ class CTAEA(GeneticAlgorithm):
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)
-        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+        # return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+        for ip,offspring in enumerate(off):
+            offspring.set("idx","%i_%i"%(self.n_gen,ip))
+        return off
 
     def _advance(self, infills=None, **kwargs):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."

@@ -10,8 +10,8 @@ class Mutation(Operator):
 
     def __init__(self, prob=1.0, prob_var=None, **kwargs) -> None:
         super().__init__(**kwargs)
-        # self.prob = Real(prob, bounds=(0.7, 1.0), strict=(0.0, 1.0))
-        # self.prob_var = Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0)) if prob_var is not None else None
+        self.prob = Real(prob, bounds=(0.7, 1.0), strict=(0.0, 1.0))
+        self.prob_var = Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0)) if prob_var is not None else None
 
     def do(self, problem, pop, inplace=True, **kwargs):
 
@@ -24,69 +24,17 @@ class Mutation(Operator):
         # get the variables to be mutated
         X = pop.get("X")
 
-        # print("Original")
         # retrieve the mutation variables
+        # Discussion: Does mutation tracking depend on the specific mutation?
         Xp,list_mutations,mut = self._do(problem, X, **kwargs)
 
-        # mut = ((X-Xp)==0).all(axis=1)
-                # store the mutated individual back to the population
-        # print(len(mut))
-        # print(len(list_mutations))
-        pop[mut].set("X", Xp[mut])
-        pop[mut].set("mutate", True)
-        pop[mut].set("mutate_rate", list_mutations)
-
-        ### REGISTRAR TIPO DE MUTACION?? 
-        # Xp2 = self._do(problem, X[~mut], **kwargs)
-        # mut2 = ((X-Xp2)==0).all(axis=1)
-        # pop[mut2].set("X", Xp2[mut2])
-        # pop[mut2].set("mutate", True)
-        # pop[mut2].set("mutate_rate", "m2")
-        # print(mut[:10])
-
-        # print("DONE")
-        # the likelihood for a mutation on the individuals
-        # prob = get(self.prob, size=n_mut)
-        # mut = np.random.random(size=n_mut) <= prob
-
-        # v2. We compute the rate increment of mutations of each individual 
-        # TODO
-        #Xmean = X[mut].mean(axis=0) #get the average 
-        # assert Xmean == 0,"The average is 0"
-        # Increment
-        # Xpre = X[mut]
-        # Xpost = Xp[mut]
-        # Xdiff = Xpre-Xpost
-
-        #Xrate = ((Xdiff*100)/Xmean)
-        # Xrate = Xrate[Xrate!=0] #Rate change of each individual in all features
-
-        # number of mutations per individual
-        # mutationsPerIndividual = (Xdiff!=0).sum(axis=1) 
-
-        # assert len(Xrate) == mutationsPerIndividual.sum(),"Number of mutations per individual does not match the registered Xrate"
-
-        # mutRateRecord = []
-        # ix = 0 
-        # for number_mutations in mutationsPerIndividual:
-        #     if number_mutations == 0:
-        #         tmp = [0]
-        #     else:
-        #         tmp = []
-        #         for _ in range(number_mutations):
-        #             tmp.append(Xrate[ix])
-        #             ix+=1
-            # mutRateRecord.append(tmp)
-
-        # print(mutRateRecord)
-        # #TODO remove
-        # print("post MUTATIONS")
-        # for ind in Xp[mut]:
-        #     print(ind)
-
-        # print(np.equal(Xp[mut],X[mut]))
-
-
+        if list_mutations is  None:
+            list_mutations = np.zeros(shape=sum(mut))
+        
+        if kwargs["algorithm"].save_tracker:
+            pop[mut].set("X", Xp[mut])
+            pop[mut].set("mutate", True)
+            pop[mut].set("mutate_rate", list_mutations)
         
         return pop
 

@@ -76,37 +76,31 @@ class Crossover(Operator):
         # create a population object
         off = Population.new("X", Xp)
 
-        # print("OFF")
-        # for parent in off:
-        #     print("\t",parent.data)
-        #     print("\t\t",parent.get("X"))
-
         # get the actual values from each of the parents
         # something weird from getting X or Q in comparison with pop and off
-        iDparents = []
-        Xparents = []
-        for imatch,parents in enumerate(pop): #n_parents
-            for parent in parents:
-                iDparents.append(parent.get("idx"))
-                Xparents.append(parent.get("X"))
+        if kwargs["algorithm"].save_tracker:
+            iDparents = []
+            Xparents = []
+            for imatch,parents in enumerate(pop): #n_parents
+                for parent in parents:
+                    iDparents.append(parent.get("idx"))
+                    Xparents.append(parent.get("X"))
 
-        for child in off:
-            Xc = child.get("X")
-            max = -1
-            ix = -1
-            for ip,Xp in enumerate(Xparents):
-                tmax = np.equal(Xp,Xc).sum()
-                if max<tmax:
-                    ix = ip
-                    max = tmax
-            otherIxFather= ix+1 if ix%n_parents==0 else ix-1
-            child.set("parent",[iDparents[ix],iDparents[otherIxFather]])
-            child.set("pf",None)
+            for child in off:
+                Xc = child.get("X")
+                Xc = Xc[0].reshape(-1)
+                max = -1
+                ix = -1
+                for ip,Xp in enumerate(Xparents):
+                    Xp = Xp[0].reshape(-1) 
+                    tmax = np.equal(Xp,Xc).sum()
+                    if max<tmax:
+                        ix = ip
+                        max = tmax
+                otherIxFather= ix+1 if ix%n_parents==0 else ix-1
+                child.set("parent",[iDparents[ix],iDparents[otherIxFather]])
+                child.set("isF",None)
 
-        # print("OFF_tagged")
-        # for parent in off:
-        #     print("\t",parent.data)
-        #     print("\t\t",parent.get("X"))
 
         return off
     def _do(self, problem, X, **kwargs):

@@ -2,6 +2,7 @@ import copy
 import time
 
 import numpy as np
+import pandas as pd
 
 from pymoo.core.callback import Callback
 from pymoo.core.evaluator import Evaluator
@@ -24,6 +25,8 @@ class Algorithm:
                  archive=None,
                  return_least_infeasible=False,
                  save_history=False,
+                 save_tracker=False,
+                 file_tracker=None,
                  verbose=False,
                  seed=None,
                  evaluator=None,
@@ -59,6 +62,13 @@ class Algorithm:
 
         # whether the history should be saved or not
         self.save_history = save_history
+        
+        # whether the tracker of the population should be saved or not
+        self.save_tracker = save_tracker
+        self.history_pop = list()
+                
+        # population features to track
+        self.record_tracker_columns=["iter","idx","created_gen","rank","crowding","parent","mutate","mutate_rate","isF"]
 
         # whether the algorithm should print output in this run or not
         self.verbose = verbose
@@ -190,9 +200,9 @@ class Algorithm:
             infills = self._infill()
 
         # set the current generation to the offsprings
-        if infills is not None:
-            infills.set("n_gen", self.n_iter)
-            infills.set("n_iter", self.n_iter)
+        if infills is not None and self.save_tracker:
+            infills.set("created_gen", self.n_iter)
+            # infills.set("n_gen", self.n_iter)
 
         return infills
 
@@ -285,6 +295,7 @@ class Algorithm:
         # create the result object
         res.problem = self.problem
         res.history = self.history
+        res.history_pop = self.history_pop
 
         return res
 
@@ -309,7 +320,7 @@ class Algorithm:
         self.display(self)
 
         # if a callback function is provided it is called after each iteration
-        self.callback(self)
+        # self.callback(self)
 
         if self.save_history:
             _hist, _callback, _display = self.history, self.callback, self.display
@@ -319,6 +330,12 @@ class Algorithm:
 
             self.history, self.callback, self.display = _hist, _callback, _display
             self.history.append(obj)
+        
+        if self.save_tracker:
+            save = {"pop":self.pop,"opt":self.opt}
+            obj = copy.deepcopy(save)
+            self.history_pop.append(obj)
+
 
         self.n_iter += 1
 
@@ -355,6 +372,7 @@ class Algorithm:
     @n_gen.setter
     def n_gen(self, value):
         self.n_iter = value
+
 
 
 class LoopwiseAlgorithm(Algorithm):

@@ -30,26 +30,8 @@ class Mating(InfillCriterion):
         # do the crossover using the parents index and the population - additional data provided if necessary
         off = self.crossover(problem, parents, **kwargs)
 
-        #TODO remove
-        # print(self.__class__)
-        # print(len(off))
-        # print("OFFSPRINGS")
-        # for ind in off:
-        #     print(ind.data)
-        #     print(ind.get("X"))
-
-
         # do the mutation on the offsprings created through crossover
         off = self.mutation(problem, off, **kwargs)
-
-
-        # #TODO remove
-        # print(self.__class__)
-        # print(len(off))
-        # print("post MUTATIONS")
-        # for ind in off:
-        #     print(ind.data)
-
 
         return off
 

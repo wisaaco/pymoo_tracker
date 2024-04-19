@@ -20,6 +20,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 
     mut = mut_binomial(n, n_var, prob, at_least_once=at_least_once)
     mut[:, xl == xu] = False
+    
 
     Xp[:, :] = X
 
@@ -63,7 +64,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
     # in case out of bounds repair (very unlikely)
     Xp = set_to_bounds_if_outside(Xp, xl, xu)
 
-    return Xp
+    return Xp,mut
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -84,9 +85,10 @@ class PolynomialMutation(Mutation):
         eta = get(self.eta, size=len(X))
         prob_var = self.get_prob_var(problem, size=len(X))
 
-        Xp = mut_pm(X, problem.xl, problem.xu, eta, prob_var, at_least_once=self.at_least_once)
-
-        return Xp
+        Xp, mut = mut_pm(X, problem.xl, problem.xu, eta, prob_var, at_least_once=self.at_least_once)
+        
+        mut = (mut.sum(axis=1)!=0) # to obtain a list of the population with mutated indiv.
+        return Xp, None, mut
 
 
 class PM(PolynomialMutation):
